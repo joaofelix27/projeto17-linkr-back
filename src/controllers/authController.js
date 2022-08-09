@@ -15,6 +15,7 @@ export async function signUp(req,res){
 
         res.sendStatus(201)
     } catch (error) {
+    	if(error.constraint === "users_email_key") return res.sendStatus(409);
         res.sendStatus(500)
     }
 }
@@ -30,7 +31,7 @@ export async function signIn(req,res){
 
             await sessionRepository.newSession(checkUser[0].id,token);
 
-            return res.status(200).send(token);
+            return res.status(200).send({token,image:checkUser[0].picture,name:checkUser[0].username});
         }else{
             return res.sendStatus(401);
         }
