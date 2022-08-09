@@ -1,5 +1,30 @@
 {
   "dependencies": {
-    "express": "^4.18.1"
-  }
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "nodemon": "^2.0.19",
+    "pg": "^8.7.3"
+  },
+  "name": "projeto17-linkr-back",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "devDependencies": {},
+  "scripts": {
+    "start": "node ./src/index.js",
+    "dev": "nodemon ./src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joaofelix27/projeto17-linkr-back.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joaofelix27/projeto17-linkr-back/issues"
+  },
+  "homepage": "https://github.com/joaofelix27/projeto17-linkr-back#readme",
+  "description": ""
 }
