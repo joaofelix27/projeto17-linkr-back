@@ -1,5 +1,5 @@
 import { v4 } from 'uuid';
-import { stripHtml } from "string-strip-html";
+//import { stripHtml } from "string-strip-html";
 import bcrypt from 'bcrypt';
 import { userRepository } from "../repositories/authRepositories/userRepository.js";
 import { sessionRepository } from '../repositories/authRepositories/sessionRepository.js';
@@ -7,9 +7,13 @@ import { sessionRepository } from '../repositories/authRepositories/sessionRepos
 export async function signUp(req,res){
     const { username,email,password,picture } = req.body;
     const passwordHash = bcrypt.hashSync(password,10);
-
-    const cleansedName = stripHtml(username).result;
-    const cleansedEmail = stripHtml(email).result;
+    
+    //const cleansedName = stripHtml(username).result;
+    //const cleansedEmail = stripHtml(email).result;
+    
+    const cleansedName = username;
+    const cleansedEmail = email;
+    
     try {
         await userRepository.newUser(cleansedName.trim(),cleansedEmail.trim(),passwordHash,picture.trim());
 
