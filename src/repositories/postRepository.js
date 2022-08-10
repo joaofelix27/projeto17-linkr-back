@@ -35,8 +35,22 @@ async function insertPost(userId, link, body){
     );
 };
 
+async function getAllPosts(){
+    return connection.query(
+        `
+            SELECT posts.id, users.username, users.picture, posts.link, posts.body
+            FROM posts
+            JOIN users
+            ON posts."userId" = users.id
+            ORDER BY id DESC
+            LIMIT 20
+        `
+    );
+}
+
 export const postRepository = {
     getSessionByToken,
     getUserById,
-    insertPost
+    insertPost,
+    getAllPosts
 };

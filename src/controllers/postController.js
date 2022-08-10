@@ -1,4 +1,5 @@
-import connection from "../dbStrategy/postgres.js";
+import urlMetadata from "url-metadata";
+
 import { postRepository } from "../repositories/postRepository.js";
 
 export async function createPost(req,res){
@@ -14,6 +15,31 @@ export async function createPost(req,res){
         await postRepository.insertPost(userId, link, body);
         res.sendStatus(201);
 
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+};
+
+export async function getAllPostsController(req, res){
+    try {
+        const {rows: posts} = await postRepository.getAllPosts();
+
+            const postsMetadata = await Promise.all(posts.map(async({id, username, picture, link, body})=>{
+                const metadata = await urlMetadata(link);
+                return {
+                    id,
+                    username,
+                    picture,
+                    link,
+                    body,
+                    title: metadata.title,
+                    image:metadata.image,
+                    description: metadata.description
+                };
+            }));
+
+        res.status(200).send(postsMetadata);
     } catch (e) {
         console.log(e);
         res.sendStatus(500);
