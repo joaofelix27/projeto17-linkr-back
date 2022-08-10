@@ -25,7 +25,7 @@ export async function getAllPostsController(req, res){
     try {
         const {rows: posts} = await postRepository.getAllPosts();
 
-            const postsMetadata = await Promise.all(posts.map(async({id, username, picture, link, body})=>{
+            const postsMetadata = await Promise.all(posts.map(async({id, username, picture, link, body,userId})=>{
                 const metadata = await urlMetadata(link);
                 return {
                     id,
@@ -33,6 +33,7 @@ export async function getAllPostsController(req, res){
                     picture,
                     link,
                     body,
+                    userId,
                     title: metadata.title,
                     image:metadata.image,
                     description: metadata.description
