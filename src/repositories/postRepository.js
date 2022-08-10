@@ -38,7 +38,7 @@ async function insertPost(userId, link, body){
 async function getAllPosts(){
     return connection.query(
         `
-            SELECT posts.id, users.username, users.picture, posts.link, posts.body
+            SELECT posts.id, users.username, users.picture, posts.link, posts.body, posts."userId" as "userId"
             FROM posts
             JOIN users
             ON posts."userId" = users.id
@@ -48,9 +48,23 @@ async function getAllPosts(){
     );
 }
 
+async function getUserPosts(id){
+    return connection.query(
+        `
+        SELECT p.id,p.link,p.body,u.username,u.picture FROM posts p
+        JOIN users u
+        ON u.id = $1
+        WHERE p."userId" = $1
+        ORDER BY id DESC
+        LIMIT 20;
+        `,[id]
+    )
+}
+
 export const postRepository = {
     getSessionByToken,
     getUserById,
     insertPost,
-    getAllPosts
+    getAllPosts,
+    getUserPosts
 };

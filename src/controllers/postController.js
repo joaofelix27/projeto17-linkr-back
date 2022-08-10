@@ -45,3 +45,29 @@ export async function getAllPostsController(req, res){
         res.sendStatus(500);
     }
 };
+
+export async function getPostById(req,res){
+    const { id } = req.params;
+    try {
+        const { rows:posts } = await postRepository.getUserPosts(id);
+
+        const postsMetadata = await Promise.all(posts.map(async({id, username, picture, link, body})=>{
+            const metadata = await urlMetadata(link);
+            return {
+                id,
+                username,
+                picture,
+                link,
+                body,
+                title: metadata.title,
+                image:metadata.image,
+                description: metadata.description
+            };
+        }));
+
+        res.status(200).send(postsMetadata);
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+}
