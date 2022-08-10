@@ -32,7 +32,7 @@ export async function signIn(req,res){
 
         if(checkUser.length > 0 && bcrypt.compareSync(password,checkUser[0].password)){
             const token = v4();
-
+            console.log(token)
             await sessionRepository.newSession(checkUser[0].id,token);
 
             return res.status(200).send({token,image:checkUser[0].picture,name:checkUser[0].username});

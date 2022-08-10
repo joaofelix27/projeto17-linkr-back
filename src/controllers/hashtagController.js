@@ -1,12 +1,22 @@
-import { getHashtag } from "../repositories/hashtagRepository.js";
+import {  getPostsByHashtag, getTrendingHashtags } from "../repositories/hashtagRepository.js";
+import urlMetadata from "url-metadata";
 
 export async function getHashtagByName(req, res) {
   const { name } = req.params;
   try {
-    const { rows: findHashtag } = await getHashtag(name);
+    const { rows: findHashtag } = await getPostsByHashtag(name);
     const findHashtagLength = findHashtag.length;
     if (findHashtagLength >0) {
-      return res.status(200).send(findHashtag)
+      const postsMetadata = await Promise.all(findHashtag.map(async(value)=>{
+        const metadata = await urlMetadata(value.link);
+        return {
+            ... value,
+            title: metadata.title,
+            image:metadata.image,
+            description: metadata.description
+        };
+      }));
+      return res.status(200).send(postsMetadata)
     } else {    
       return res.sendStatus(404);
     }
@@ -14,4 +24,18 @@ export async function getHashtagByName(req, res) {
     res.status(500).send(e.message);
   }
 }
-export async function createHashtag(req, res) {}
+// export async function createHashtag(req, res) {}
+
+export async function getTrending(req,res){
+  try {
+    const { rows: findHashtags } = await getTrendingHashtags();
+    const findHashtagsLength = findHashtags.length;
+    if (findHashtagsLength >0) {
+      return res.status(200).send(findHashtags)
+    } else {    
+      return res.sendStatus(404);
+    }
+  } catch (e) {
+    res.status(500).send(e.message);
+  }
+}
