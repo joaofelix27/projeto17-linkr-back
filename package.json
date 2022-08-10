@@ -7,7 +7,7 @@
     "joi": "^17.6.0",
     "nodemon": "^2.0.19",
     "pg": "^8.7.3",
-    "string-strip-html": "^11.1.0",
+    "url-metadata": "^2.5.0",
     "uuid": "^8.3.2"
   },
   "name": "projeto17-linkr-back",
