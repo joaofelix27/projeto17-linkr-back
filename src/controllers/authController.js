@@ -1,8 +1,8 @@
 import { v4 } from 'uuid';
 import { stripHtml } from "string-strip-html";
 import bcrypt from 'bcrypt';
-import { userRepository } from "../repositories/userRepository.js";
-import { sessionRepository } from '../repositories/sessionRepository.js';
+import { userRepository } from "../repositories/authRepositories/userRepository.js";
+import { sessionRepository } from '../repositories/authRepositories/sessionRepository.js';
 
 export async function signUp(req,res){
     const { username,email,password,picture } = req.body;

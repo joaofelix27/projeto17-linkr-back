@@ -1,4 +1,4 @@
-import connection from "../dbStrategy/postgres.js";
+import connection from "../../dbStrategy/postgres.js";
 
 async function newSession(userId,token){
     return connection.query(`
