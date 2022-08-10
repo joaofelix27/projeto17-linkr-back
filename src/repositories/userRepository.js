@@ -12,7 +12,15 @@ async function newUser(name,email,password,picture){
     VALUES ($1,$2,$3,$4)`,[name,email,password,picture])
 }
 
+async function searchUsers(name){
+    return connection.query(`
+    SELECT id,username,picture FROM users
+    WHERE username ILIKE '%${name}%'
+    `)
+}
+
 export const userRepository = {
     getUser,
-    newUser
+    newUser,
+    searchUsers
 }
