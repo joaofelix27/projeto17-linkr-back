@@ -1,4 +1,3 @@
-
 import urlMetadata from "url-metadata";
 import { sessionRepository } from "../repositories/authRepositories/sessionRepository.js";
 import { postRepository } from "../repositories/postsRepositories/postRepository.js";
@@ -22,10 +21,9 @@ export async function createPost(req, res) {
 }
 
 export async function getAllPostsController(req, res) {
-    const { userInfo } = res.locals
+    const { userInfo } = res.locals;
 
     try {
-
         const { rows: posts } = await postRepository.getAllPosts();
 
         const postsMetadata = await Promise.all(
@@ -59,8 +57,8 @@ export async function getAllPostsController(req, res) {
 
         const resData = {
             postsMetadata,
-            userInfo
-        }
+            userInfo,
+        };
 
         res.status(200).send(resData);
     } catch (e) {
