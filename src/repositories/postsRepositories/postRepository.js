@@ -1,4 +1,4 @@
-import connection from "../dbStrategy/postgres.js";
+import connection from "../../dbStrategy/postgres.js";
 
 async function getSessionByToken(token) {
     return connection.query(
@@ -9,7 +9,7 @@ async function getSessionByToken(token) {
         `,
         [token]
     );
-};
+}
 
 async function getUserById(id) {
     return connection.query(
@@ -20,9 +20,9 @@ async function getUserById(id) {
         `,
         [id]
     );
-};
+}
 
-async function insertPost(userId, link, body){
+async function insertPost(userId, link, body) {
     return connection.query(
         `
             INSERT 
@@ -31,24 +31,27 @@ async function insertPost(userId, link, body){
             VALUES
             ($1, $2, $3)
         `,
-        [userId, link, body ]
+        [userId, link, body]
     );
-};
+}
 
-async function getAllPosts(){
+async function getAllPosts() {
     return connection.query(
         `
-            SELECT posts.id, users.username, users.picture, posts.link, posts.body, posts."userId" as "userId"
-            FROM posts
-            JOIN users
-            ON posts."userId" = users.id
-            ORDER BY id DESC
-            LIMIT 20
+        SELECT posts.id, users.username, users.picture, posts.link, posts.body, posts."userId" as "userId", COUNT (likes."postId") as likes
+        FROM posts
+        JOIN users
+        ON posts."userId" = users.id
+        LEFT JOIN likes
+        ON likes."postId" = posts.id
+        GROUP BY ( posts.id, users.username, users.picture, posts.link, posts.body, posts."userId")
+        ORDER BY id DESC
+        LIMIT 20
         `
     );
 }
 
-async function getUserPosts(id){
+async function getUserPosts(id) {
     return connection.query(
         `
         SELECT p.id,p.link,p.body,u.username,u.picture FROM posts p
@@ -57,8 +60,9 @@ async function getUserPosts(id){
         WHERE p."userId" = $1
         ORDER BY id DESC
         LIMIT 20;
-        `,[id]
-    )
+        `,
+        [id]
+    );
 }
 
 export const postRepository = {
@@ -66,5 +70,5 @@ export const postRepository = {
     getUserById,
     insertPost,
     getAllPosts,
-    getUserPosts
+    getUserPosts,
 };
