@@ -7,3 +7,4 @@ hashtagRouter.get('/hashtags/:name',getHashtagByName);
 hashtagRouter.get('/trending',getTrending);
 
 export default hashtagRouter;
+
