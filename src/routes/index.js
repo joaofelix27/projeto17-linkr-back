@@ -8,6 +8,7 @@ import searchRouter from "./searchRouter.js";
 const router = Router();
 
 router.use(authRouter);
+router.use(hashtagRouter);
 router.use(postRouter);
 router.use(searchRouter);
 router.use(likesRouter);
