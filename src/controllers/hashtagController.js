@@ -32,7 +32,7 @@ export async function createHashtag(req, res) {
     const withoutHash= value.replace("#","")
      const {rows: hashtagExists}= await matchHashtag(withoutHash);
      const hashtagExistsLength=hashtagExists.length
-     if (hashtagExistsLength===0){
+     if (hashtagExistsLength===0){  
        created=true
        await insertHashtag (withoutHash)
      }
