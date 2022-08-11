@@ -38,6 +38,7 @@ export async function signIn(req, res) {
     try {
         const { rows: checkUser } = await userRepository.getUser(email);
 
+
         if (
             checkUser.length > 0 &&
             bcrypt.compareSync(password, checkUser[0].password)
@@ -50,6 +51,7 @@ export async function signIn(req, res) {
             const token = jwt.sign({ sessionId }, process.env.JWT_SECRET, {
                 expiresIn: "30d",
             });
+
 
             return res.status(200).send({
                 token,
