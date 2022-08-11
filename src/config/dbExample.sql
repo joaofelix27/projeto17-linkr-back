@@ -54,6 +54,7 @@ CREATE TABLE public."hashtagPost" (
 CREATE TABLE public.hashtag (
     "id" serial NOT NULL UNIQUE,
     "name" varchar(100) NOT NULL UNIQUE,
+    "usedCount" int NOT NULL DEFAULT 1  
     CONSTRAINT "hashtag_pk" PRIMARY KEY ("id"),
     "createdAt" timestamp with time zone NOT NULL DEFAULT 'NOW()'
 ) WITH (

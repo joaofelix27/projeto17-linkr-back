@@ -1,4 +1,4 @@
-import {  getPostsByHashtag, getTrendingHashtags } from "../repositories/hashtagRepository.js";
+import {  getPostsByHashtag, getTrendingHashtags } from "../repositories/hashtagRepositories/hashtagRepository.js";
 import urlMetadata from "url-metadata";
 
 export async function getHashtagByName(req, res) {

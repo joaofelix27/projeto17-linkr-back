@@ -6,9 +6,8 @@ import {
   insertHashtagPosts,
   matchHashtag,
   updateHashtag,
-} from "../repositories/hashtagRepository.js";
+} from "../repositories/hashtagRepositories/hashtagRepository.js";
 
-import { postRepository } from "../repositories/postRepository.js";
 
 export async function createPost(req, res) {
   const { link, body, hashtags } = req.body;
