@@ -17,7 +17,7 @@ export function getTrendingHashtags() {
         `SELECT id,name, "usedCount" FROM hashtag ORDER BY "usedCount" DESC LIMIT 10;`
     );
 }
-
+//
 export function matchHashtag(name) {
     return connection.query(`SELECT * FROM  hashtag WHERE name='${name}';`);
 }
