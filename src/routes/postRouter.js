@@ -6,7 +6,7 @@ import { postSchema } from '../schemas/postSchema.js';
 
 const postRouter = Router();
 
-postRouter.post("/timeline/create", authValidator(postSchema), userValidator, createPost);
+postRouter.post("/timeline/create",  createPost);
 postRouter.get("/timeline", getAllPostsController); 
 
 export default postRouter;

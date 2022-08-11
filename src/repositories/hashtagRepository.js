@@ -30,13 +30,13 @@ export function insertHashtag(name) {
 }
 export function insertHashtagPosts(postId,hashtagId) {
   return connection.query(
-    ` INSERT INTO hashtag (name)
-    VALUES ($1)`,
-    [name]
+    ` INSERT INTO "hashtagPost" ("postId","hashtagId")
+    VALUES ($1,$2)`,
+    [postId,hashtagId]
   );
 }
 export function updateHashtag(usedCount,name) {
   return connection.query(
-    `UPDATE hashtag SET "usedCount"=$1 WHERE "shortUrl"=$2;`,[usedCount+1,name]
+    `UPDATE hashtag SET "usedCount"=$1 WHERE name=$2;`,[usedCount+1,name]
   );
 }
