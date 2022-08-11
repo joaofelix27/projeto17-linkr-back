@@ -1,4 +1,4 @@
-import { postRepository } from "../repositories/postRepository.js";
+import { postRepository } from "../repositories/postsRepositories/postRepository.js";
 
 export const userValidator = async (req, res, next) => {
     const {authorization} = req.headers;
