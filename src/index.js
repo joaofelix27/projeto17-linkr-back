@@ -13,4 +13,8 @@ app.use(router);
 
 
 const PORT = process.env.PORT || 4000
+
 app.listen(PORT, () => console.log(`Servidor is running on port ${PORT}`));
+
+
+/* Testar merge */
