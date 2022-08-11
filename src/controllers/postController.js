@@ -1,5 +1,10 @@
 import urlMetadata from "url-metadata";
-import { insertHashtag, insertHashtagPosts, matchHashtag, updateHashtag } from "../repositories/hashtagRepository.js";
+import {
+  insertHashtag,
+  insertHashtagPosts,
+  matchHashtag,
+  updateHashtag,
+} from "../repositories/hashtagRepository.js";
 
 import { postRepository } from "../repositories/postRepository.js";
 
@@ -7,30 +12,29 @@ export async function createPost(req, res) {
   const { link, body, hashtags } = req.body;
   const session = res.locals.session;
   try {
-    // const userId = session.userId;
+    const userId = session.userId;
 
-    // const { rows: user } = await postRepository.getUserById(userId);
+    const { rows: user } = await postRepository.getUserById(userId);
 
-    // if (user.length === 0) return res.status(404).send("User not found");
-
-    const {rows:postId} =await postRepository.insertPost(1, link, body);
-    const id1=postId[0]?.id
-    let hashtagId=0
+    if (user.length === 0) return res.status(404).send("User not found");
+    
+    const { rows: post } = await postRepository.insertPost(userId, link, body);
+    const postId = post[0]?.id;
     if (hashtags.length !== 0) {
       await Promise.all(
         hashtags.map(async (value) => {
           const withoutHash = value.replace("#", "");
           const { rows: hashtagExists } = await matchHashtag(withoutHash);
           const hashtagExistsLength = hashtagExists.length;
-          hashtagId=hashtagExists?.id
+          const hashtagId = hashtagExists[0]?.id;
           if (hashtagExistsLength === 0) {
-          const {rows:hashtag2} = await insertHashtag(withoutHash);
-          hashtagId=hashtag2[0]?.id
-        
+            const { rows: newHashtag } = await insertHashtag(withoutHash);
+            const newHashtagId = newHashtag[0]?.id;
+            await insertHashtagPosts(postId, newHashtagId);
           } else {
-            await updateHashtag(hashtagExists[0]?.usedCount,withoutHash);
+            await updateHashtag(hashtagExists[0]?.usedCount, withoutHash);
+            await insertHashtagPosts(postId, hashtagId);
           }
-          await insertHashtagPosts(id1,hashtagId);
         })
       );
     }
