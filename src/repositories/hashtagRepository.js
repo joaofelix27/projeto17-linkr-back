@@ -28,3 +28,15 @@ export function insertHashtag(name) {
     [name]
   );
 }
+export function insertHashtagPosts(postId,hashtagId) {
+  return connection.query(
+    ` INSERT INTO hashtag (name)
+    VALUES ($1)`,
+    [name]
+  );
+}
+export function updateHashtag(usedCount,name) {
+  return connection.query(
+    `UPDATE hashtag SET "usedCount"=$1 WHERE "shortUrl"=$2;`,[usedCount+1,name]
+  );
+}

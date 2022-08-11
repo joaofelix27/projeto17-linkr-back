@@ -29,7 +29,7 @@ async function insertPost(userId, link, body){
             INTO posts
             ("userId", link, body)
             VALUES
-            ($1, $2, $3)
+            ($1, $2, $3) RETURNING id
         `,
         [userId, link, body ]
     );
