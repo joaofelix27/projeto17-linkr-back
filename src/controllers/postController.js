@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+
 import urlMetadata from "url-metadata";
 import { sessionRepository } from "../repositories/authRepositories/sessionRepository.js";
 import { postRepository } from "../repositories/postsRepositories/postRepository.js";
@@ -22,14 +22,9 @@ export async function createPost(req, res) {
 }
 
 export async function getAllPostsController(req, res) {
-    const { authorization } = req.headers;
-    const token = authorization?.replace("Bearer ", "");
-    const { sessionId } = jwt.verify(token, process.env.JWT_SECRET);
+    const { userInfo } = res.locals
 
     try {
-        const { rows: userInfo } = await sessionRepository.searchSession(
-            sessionId
-        );
 
         const { rows: posts } = await postRepository.getAllPosts();
 

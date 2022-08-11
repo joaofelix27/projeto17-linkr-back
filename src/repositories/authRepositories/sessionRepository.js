@@ -8,7 +8,7 @@ async function newSession(userId){
 
 async function searchSession(sessionId){
     return connection.query(`
-    SELECT picture, username FROM sessions s JOIN users ON users.id = "userId" WHERE s.id = $1
+    SELECT picture, username, "userId" FROM sessions s JOIN users ON users.id = "userId" WHERE s.id = $1
     `, [ sessionId ])
 }
 
