@@ -1,10 +1,9 @@
 import { stripHtml } from "string-strip-html";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { userRepository } from "../repositories/authRepositories/userRepository.js";
 import { sessionRepository } from "../repositories/authRepositories/sessionRepository.js";
-import generateUserToken from "../../utils/generateToken.js";
+import generateUserToken from "../utils/generateToken.js";
 
 dotenv.config();
 
