@@ -109,7 +109,8 @@ export async function getPostById(req, res) {
         const { rows: posts } = await postRepository.getUserPosts(id);
 
         const postsMetadata = await Promise.all(
-            posts.map(async ({ id, username, picture, link, body }) => {
+            posts.map(async ({ id, likes, username, picture, link, body }) => {
+                const like = parseInt(likes);
                 const metadata = await urlMetadata(link);
                 return {
                     id,
@@ -117,6 +118,7 @@ export async function getPostById(req, res) {
                     picture,
                     link,
                     body,
+                    like,
                     title: metadata.title,
                     image: metadata.image,
                     description: metadata.description,

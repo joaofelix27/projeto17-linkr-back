@@ -54,10 +54,14 @@ async function getAllPosts() {
 async function getUserPosts(id) {
     return connection.query(
         `
-        SELECT p.id,p.link,p.body,u.username,u.picture FROM posts p
+        SELECT COUNT(l."postId") as likes,p.id, u.username, u.picture, p.link, p.body, p."userId" as "userId" 
+        FROM posts p
         JOIN users u
-        ON u.id = $1
+        ON p."userId" = u.id
+        LEFT JOIN likes l
+        ON l."postId" = p.id
         WHERE p."userId" = $1
+        GROUP BY ( p.id, u.username, u.picture, p.link, p.body, p."userId")
         ORDER BY id DESC
         LIMIT 20;
         `,
