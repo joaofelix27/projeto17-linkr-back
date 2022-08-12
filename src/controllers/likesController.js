@@ -16,7 +16,7 @@ export async function likeGetController(req, res) {
             isLiked,
             userId,
         };
-        
+
         return res.status(200).send(resData);
     } catch (e) {
         console.log(e);

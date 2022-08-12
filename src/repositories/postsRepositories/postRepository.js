@@ -29,7 +29,7 @@ async function insertPost(userId, link, body) {
             INTO posts
             ("userId", link, body)
             VALUES
-            ($1, $2, $3)
+            ($1, $2, $3) RETURNING id
         `,
         [userId, link, body]
     );
@@ -65,10 +65,23 @@ async function getUserPosts(id) {
     );
 }
 
+function deletingPostQuery(userId, postId){
+    console.log("chamou")
+    return connection.query(
+        `
+        DELETE FROM posts 
+        WHERE "userId" = $1
+        AND id = $2
+        `,
+        [userId, postId]
+    )
+}
+
 export const postRepository = {
     getSessionByToken,
     getUserById,
     insertPost,
     getAllPosts,
     getUserPosts,
+    deletingPostQuery
 };
