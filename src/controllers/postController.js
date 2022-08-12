@@ -49,10 +49,12 @@ export async function createPost(req, res) {
 
 export async function getAllPostsController(req, res) {
   try {
+    const { userInfo } = res.locals;
     const { rows: posts } = await postRepository.getAllPosts();
 
     const postsMetadata = await Promise.all(
-      posts.map(async ({ id, username, picture, link, body }) => {
+      posts.map(async ({ id, username, picture, link, body, userId, likes }) => {
+        const like = parseInt(likes);
         const metadata = await urlMetadata(link);
         return {
           id,
@@ -60,6 +62,8 @@ export async function getAllPostsController(req, res) {
           picture,
           link,
           body,
+          userId,
+          like,
           title: metadata.title,
           image: metadata.image,
           description: metadata.description,
@@ -67,7 +71,12 @@ export async function getAllPostsController(req, res) {
       })
     );
 
-    res.status(200).send(postsMetadata);
+    const resData = {
+        postsMetadata,
+        userInfo,
+    };
+
+    res.status(200).send(resData);
   } catch (e) {
     console.log(e);
     res.sendStatus(500);
