@@ -65,10 +65,23 @@ async function getUserPosts(id) {
     );
 }
 
+function deletingPostQuery(userId, postId){
+    console.log("chamou")
+    return connection.query(
+        `
+        DELETE FROM posts 
+        WHERE "userId" = $1
+        AND id = $2
+        `,
+        [userId, postId]
+    )
+}
+
 export const postRepository = {
     getSessionByToken,
     getUserById,
     insertPost,
     getAllPosts,
     getUserPosts,
+    deletingPostQuery
 };

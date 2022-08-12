@@ -2,6 +2,7 @@ import { Router } from "express";
 import  getUserData  from "../middlewares/getUserData.js";
 import {
   createPost,
+  deletePost,
   getAllPostsController,
   getPostById,
 } from "../controllers/postController.js";
@@ -18,5 +19,6 @@ postRouter.post(
 );
 postRouter.get("/timeline", getUserData, getAllPostsController);
 postRouter.get("/timeline/user/:id", getPostById);
+postRouter.delete("/timeline/:id", getUserData, deletePost)
 
 export default postRouter;

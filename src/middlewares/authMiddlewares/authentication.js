@@ -6,3 +6,5 @@ export default async function authentication(req, res, next) {
     res.locals.token = token;
     next();
 }
+
+
