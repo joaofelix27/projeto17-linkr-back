@@ -39,6 +39,6 @@ export async function alreadyLiked(req, res, next) {
     } catch (e) {
         console.log(e);
 
-        return res.statusSend(500);
+        return res.sendStatus(500);
     }
 }
