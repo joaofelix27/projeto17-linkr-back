@@ -1,10 +1,4 @@
-
-import {
-    getPostsByHashtag,
-    getTrendingHashtags,
-    insertHashtag,
-    matchHashtag,
-} from "../repositories/hashtagRepositories/hashtagRepository.js";
+import {  getPostsByHashtag, getTrendingHashtags } from "../repositories/hashtagRepositories/hashtagRepository.js";
 import urlMetadata from "url-metadata";
 
 export async function getHashtagByName(req, res) {
@@ -32,31 +26,6 @@ export async function getHashtagByName(req, res) {
         res.status(500).send(e.message);
     }
 }
-export async function createHashtag(req, res) {
-    const { hashtags } = req.body;
-    let created = false;
-    try {
-        await Promise.all(
-            hashtags.map(async (value) => {
-                const withoutHash = value.replace("#", "");
-                const { rows: hashtagExists } = await matchHashtag(withoutHash);
-                const hashtagExistsLength = hashtagExists.length;
-                if (hashtagExistsLength === 0) {
-                    created = true;
-                    await insertHashtag(withoutHash);
-                }
-            })
-        );
-        if (created) {
-            return res.sendStatus(201);
-        } else {
-            return res.sendStatus(404);
-        }
-    } catch (e) {
-        res.status(500).send(e.message);
-    }
-}
-
 export async function getTrending(req, res) {
     try {
         const { rows: findHashtags } = await getTrendingHashtags();
@@ -69,4 +38,6 @@ export async function getTrending(req, res) {
     } catch (e) {
         res.status(500).send(e.message);
     }
+
 }
+
