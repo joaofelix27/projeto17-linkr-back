@@ -69,3 +69,4 @@ export async function getTrending(req, res) {
     } catch (e) {
         res.status(500).send(e.message);
     }
+}
