@@ -63,10 +63,10 @@ CREATE TABLE public.hashtag (
 
 
 
-ALTER TABLE "posts" ADD CONSTRAINT "posts_fk0" FOREIGN KEY ("userId") REFERENCES "users"("id");
+ALTER TABLE "posts" ADD CONSTRAINT "posts_fk0" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE;
 
-ALTER TABLE "likes" ADD CONSTRAINT "likes_fk0" FOREIGN KEY ("postId") REFERENCES "posts"("id");
-ALTER TABLE "likes" ADD CONSTRAINT "likes_fk1" FOREIGN KEY ("userId") REFERENCES "users"("id");
+ALTER TABLE "likes" ADD CONSTRAINT "likes_fk0" FOREIGN KEY ("postId") REFERENCES "posts"("id") ON DELETE CASCADE;
+ALTER TABLE "likes" ADD CONSTRAINT "likes_fk1" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE;
 
-ALTER TABLE "hashtagPost" ADD CONSTRAINT "hashtagPost_fk0" FOREIGN KEY ("postId") REFERENCES "posts"("id");
-ALTER TABLE "hashtagPost" ADD CONSTRAINT "hashtagPost_fk1" FOREIGN KEY ("hashtagId") REFERENCES "hashtag"("id");
+ALTER TABLE "hashtagPost" ADD CONSTRAINT "hashtagPost_fk0" FOREIGN KEY ("postId") REFERENCES "posts"("id") ON DELETE CASCADE;
+ALTER TABLE "hashtagPost" ADD CONSTRAINT "hashtagPost_fk1" FOREIGN KEY ("hashtagId") REFERENCES "hashtag"("id") ON DELETE CASCADE;
