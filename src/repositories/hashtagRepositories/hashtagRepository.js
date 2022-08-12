@@ -1,16 +1,11 @@
 import connection from "../../dbStrategy/postgres.js";
 
-// export function getHashtag (name) {
-//     return connection.query(`SELECT * FROM posts WHERE body LIKE '%#${name}'`)
-//
-
 //COLOCAR BIND PARAMS
 
 export function getPostsByHashtag(name) {
   return connection.query(
-    `SELECT p.id,u.username,u.picture,p.link,p.body FROM "hashtagPost" hp JOIN posts p ON hp."postId"=p.id JOIN users u ON p."userId"=u.id WHERE hp."hashtagId"=(SELECT id FROM hashtag WHERE name='${name}');`
+    `SELECT p.id,u.username,u.picture,p.link,p.body,COUNT(l.id) as like FROM "hashtagPost" hp JOIN posts p ON hp."postId"=p.id JOIN users u ON p."userId"=u.id JOIN likes l on hp."postId"=l."postId"  WHERE hp."hashtagId"=(SELECT id FROM hashtag WHERE name='${name}')GROUP BY p.id,u.username,u.picture,p.link,p.body;`
   );
-  // SELECT p.* FROM "hashtagPost" hp JOIN posts p ON hp."postId"=p.id WHERE hp."hashtagId"=(SELECT id FROM hashtag WHERE name='${name}'
 }
 export function getTrendingHashtags() {
   return connection.query(
