@@ -1,9 +1,10 @@
-//import { stripHtml } from "string-strip-html";
+import { stripHtml } from "string-strip-html";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { userRepository } from "../repositories/authRepositories/userRepository.js";
 import { sessionRepository } from "../repositories/authRepositories/sessionRepository.js";
+import generateUserToken from "../../utils/generateToken.js";
 
 dotenv.config();
 
@@ -11,11 +12,8 @@ export async function signUp(req, res) {
     const { username, email, password, picture } = req.body;
     const passwordHash = bcrypt.hashSync(password, 10);
 
-    //const cleansedName = stripHtml(username).result;
-    //const cleansedEmail = stripHtml(email).result;
-
-    const cleansedName = username;
-    const cleansedEmail = email;
+    const cleansedName = stripHtml(username).result;
+    const cleansedEmail = stripHtml(email).result;
 
     try {
         await userRepository.newUser(
@@ -48,10 +46,7 @@ export async function signIn(req, res) {
             );
 
             const sessionId = session[0].id;
-            const token = jwt.sign({ sessionId }, process.env.JWT_SECRET, {
-                expiresIn: "30d",
-            });
-
+            const token = generateUserToken(sessionId);
 
             return res.status(200).send({
                 token,
@@ -63,31 +58,6 @@ export async function signIn(req, res) {
         }
     } catch (error) {
         console.log(error);
-
-        res.sendStatus(500);
-    }
-}
-
-export async function getUserData(req, res, next) {
-    const { authorization } = req.headers;
-    const token = authorization?.replace("Bearer ", "");
-
-    try {
-        const { sessionId } = jwt.verify(token, process.env.JWT_SECRET);
-
-        const { rows: userInfo } = await sessionRepository.searchSession(
-            sessionId
-        );
-
-        if (userInfo.length !== 1) {
-            return res.status(401).send("Token invalid or expired");
-        }
-
-        res.locals.userInfo = userInfo[0];
-
-        next();
-    } catch (e) {
-        console.log(e, "parei aqui");
 
         res.sendStatus(500);
     }

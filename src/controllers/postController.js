@@ -11,17 +11,20 @@ import {
 
 export async function createPost(req, res) {
   const { link, body, hashtags } = req.body;
-  const session = res.locals.session;
+  const session = res.locals.userInfo;
   try {
     const userId = session.userId;
 
     const { rows: user } = await postRepository.getUserById(userId);
 
     if (user.length === 0) return res.status(404).send("User not found");
-    
+
     const { rows: post } = await postRepository.insertPost(userId, link, body);
+
     const postId = post[0]?.id;
+    
     if (hashtags.length !== 0) {
+      
       await Promise.all(
         hashtags.map(async (value) => {
           const withoutHash = value.replace("#", "");
@@ -42,7 +45,7 @@ export async function createPost(req, res) {
 
     res.sendStatus(201);
   } catch (e) {
-    console.log(e.message);
+    console.log(e);
     res.sendStatus(500);
   }
 }

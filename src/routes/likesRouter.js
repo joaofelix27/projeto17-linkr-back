@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getUserData } from "../controllers/authController.js";
+import getUserData from "../middlewares/getUserData.js";
 import {
     likePostController,
     likeRemoveController,
