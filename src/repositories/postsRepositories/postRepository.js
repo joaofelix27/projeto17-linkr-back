@@ -69,8 +69,7 @@ async function getUserPosts(id) {
     );
 }
 
-function deletingPostQuery(userId, postId){
-    console.log("chamou")
+function deletingPostQuery(userId, postId) {
     return connection.query(
         `
         DELETE FROM posts 
@@ -78,7 +77,19 @@ function deletingPostQuery(userId, postId){
         AND id = $2
         `,
         [userId, postId]
-    )
+    );
+}
+
+function putPostQuery(body, userId, postId) {
+    return connection.query(
+        `
+    UPDATE posts 
+    SET body = $1
+    WHERE "userId" = $2
+    AND id = $3
+    `,
+        [body, userId, postId]
+    );
 }
 
 export const postRepository = {
@@ -87,5 +98,6 @@ export const postRepository = {
     insertPost,
     getAllPosts,
     getUserPosts,
-    deletingPostQuery
+    deletingPostQuery,
+    putPostQuery,
 };

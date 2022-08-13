@@ -18,3 +18,4 @@ export const userValidator = async (req, res, next) => {
         res.sendStatus(500);
     }
 };
+
