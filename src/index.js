@@ -12,6 +12,6 @@ app.use(cors());
 app.use(router);
 
 const PORT = process.env.PORT || 4000;
-
+/* fix merge */
 app.listen(PORT, () => console.log(`Servidor is running on port ${PORT}`));
 

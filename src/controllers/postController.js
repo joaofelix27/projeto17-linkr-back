@@ -62,7 +62,6 @@ export async function getAllPostsController(req, res) {
     try {
         const { userInfo } = res.locals;
         const { rows: posts } = await postRepository.getAllPosts();
-
         const postsMetadata = await Promise.all(
             posts.map(
                 async ({
@@ -91,7 +90,6 @@ export async function getAllPostsController(req, res) {
                 }
             )
         );
-
         const resData = {
             postsMetadata,
             userInfo,
@@ -131,16 +129,42 @@ export async function getPostById(req, res) {
     }
 }
 
+export async function putPost(req, res) {
+    const { id } = req.params;
+    const { bodyValue: body} = req.body
+    const { userInfo } = res.locals;
+    const postId = parseInt(id);
+
+    try {
+        const { rowCount } = await postRepository.putPostQuery(body,
+            userInfo.userId,
+            postId
+        );
+
+        if (rowCount !== 1) {
+            return res.sendStatus(404);
+        }
+ 
+        res.sendStatus(200);
+    } catch (e) {
+        console.log(e);
+
+        return res.sendStatus(500);
+    }
+}
+
 export async function deletePost(req, res) {
     const { id } = req.params;
     const { userInfo } = res.locals;
     const postId = parseInt(id);
-    console.log(id, postId);
     try {
-        const { rowCount } = await postRepository.deletingPostQuery(userInfo.userId, postId);
+        const { rowCount } = await postRepository.deletingPostQuery(
+            userInfo.userId,
+            postId
+        );
 
-        if(rowCount !== 1){
-          return res.sendStatus(404)
+        if (rowCount !== 1) {
+            return res.sendStatus(404);
         }
 
         res.sendStatus(200);
