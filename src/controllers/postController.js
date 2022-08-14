@@ -3,8 +3,7 @@ import { postRepository } from "../repositories/postsRepositories/postRepository
 import {
     insertHashtag,
     insertHashtagPosts,
-    matchHashtag,
-    updateHashtag,
+    matchHashtag
 } from "../repositories/hashtagRepositories/hashtagRepository.js";
 
 export async function createPost(req, res) {
@@ -41,10 +40,6 @@ export async function createPost(req, res) {
                         const newHashtagId = newHashtag[0]?.id;
                         await insertHashtagPosts(postId, newHashtagId);
                     } else {
-                        await updateHashtag(
-                            hashtagExists[0]?.usedCount,
-                            withoutHash
-                        );
                         await insertHashtagPosts(postId, hashtagId);
                     }
                 })
