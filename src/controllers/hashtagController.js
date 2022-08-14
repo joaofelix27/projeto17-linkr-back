@@ -6,6 +6,7 @@ import urlMetadata from "url-metadata";
 
 export async function getHashtagByName(req, res) {
     const { name } = req.params;
+    const { userInfo } = res.locals;
     try {
         const { rows: findHashtag } = await getPostsByHashtag(name);
 
@@ -25,7 +26,13 @@ export async function getHashtagByName(req, res) {
                     };
                 })
             );
-            return res.status(200).send(postsMetadata);
+
+            const resData = {
+                postsMetadata,
+                userInfo,
+            };
+
+            return res.status(200).send(resData);
         } else {
             return res.sendStatus(404);
         }

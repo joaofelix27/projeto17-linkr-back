@@ -4,7 +4,7 @@ import connection from "../../dbStrategy/postgres.js";
 export function getPostsByHashtag(name) {
 
     return connection.query(
-        `SELECT p.id,u.username,u.picture,p.link,p.body,COUNT (likes."postId") as likes
+        `SELECT p.id,u.username,u.picture,p.link,p.body,p."userId" as "userId",COUNT (likes."postId") as likes
     FROM "hashtagPost" hp 
     JOIN posts p ON hp."postId"=p.id 
     JOIN users u ON p."userId"=u.id 

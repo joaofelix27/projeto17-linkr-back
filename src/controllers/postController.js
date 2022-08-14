@@ -98,11 +98,12 @@ export async function getAllPostsController(req, res) {
 }
 export async function getPostById(req, res) {
     const { id } = req.params;
+    const { userInfo } = res.locals;
     try {
         const { rows: posts } = await postRepository.getUserPosts(id);
 
         const postsMetadata = await Promise.all(
-            posts.map(async ({ id, likes, username, picture, link, body }) => {
+            posts.map(async ({ id, likes, username, picture, link, body, userId }) => {
                 const like = parseInt(likes);
                 const metadata = await urlMetadata(link);
                 return {
@@ -112,6 +113,7 @@ export async function getPostById(req, res) {
                     link,
                     body,
                     like,
+                    userId,
                     title: metadata.title,
                     image: metadata.image,
                     description: metadata.description,
@@ -127,8 +129,9 @@ export async function getPostById(req, res) {
 }
 
 export async function putPost(req, res) {
+    console.log(req.body)
     const { id } = req.params;
-    const { bodyValue: body} = req.body
+    const { bodyValue: body, hashtags} = req.body
     const { userInfo } = res.locals;
     const postId = parseInt(id);
 
@@ -141,6 +144,29 @@ export async function putPost(req, res) {
         if (rowCount !== 1) {
             return res.sendStatus(404);
         }
+
+        if (hashtags.length !== 0) {
+            await Promise.all(
+                hashtags.map(async (value) => {
+                    const withoutHash = value.replace("#", "");
+                    const { rows: hashtagExists } = await matchHashtag(
+                        withoutHash
+                    );
+                    const hashtagExistsLength = hashtagExists.length;
+                    const hashtagId = hashtagExists[0]?.id;
+                    if (hashtagExistsLength === 0) {
+                        const { rows: newHashtag } = await insertHashtag(
+                            withoutHash
+                        );
+                        const newHashtagId = newHashtag[0]?.id;
+                        await insertHashtagPosts(postId, newHashtagId);
+                    } else {
+                        await insertHashtagPosts(postId, hashtagId);
+                    }
+                })
+            );
+        }
+
  
         res.sendStatus(200);
     } catch (e) {

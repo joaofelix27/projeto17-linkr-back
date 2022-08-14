@@ -19,7 +19,7 @@ postRouter.post(
   createPost
 );
 postRouter.get("/timeline", getUserData, getAllPostsController);
-postRouter.get("/timeline/user/:id", getPostById);
+postRouter.get("/timeline/user/:id", getUserData, getPostById);
 postRouter.delete("/timeline/:id", getUserData, deletePost)
 postRouter.put("/timeline/:id", getUserData, putPost)
 

@@ -14,6 +14,7 @@ export default async function getUserData(req, res, next) {
         );
 
         if (userInfo.length !== 1) {
+            
             return res.status(401).send("Token invalid or expired");
         }
 
