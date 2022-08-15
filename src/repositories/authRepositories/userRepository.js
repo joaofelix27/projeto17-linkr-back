@@ -25,8 +25,18 @@ async function searchUsers(name) {
     `);
 }
 
+async function getUserById(id) {
+    return connection.query(
+        `
+    SELECT username FROM users 
+    WHERE id = $1`,
+        [id]
+    );
+}
+
 export const userRepository = {
     getUser,
     newUser,
     searchUsers,
+    getUserById
 };
