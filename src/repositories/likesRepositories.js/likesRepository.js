@@ -1,8 +1,8 @@
 import connection from "../../dbStrategy/postgres.js";
 
-function getLikes() {
+function getLikes(postId) {
     return connection.query(
-        `SELECT username, "userId" FROM likes JOIN users u ON "userId" = u.id`
+        `SELECT username, "userId" FROM likes JOIN users u ON "userId" = u.id WHERE "postId" = $1`, [postId]
     );
 }
 

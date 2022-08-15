@@ -42,3 +42,52 @@ export async function alreadyLiked(req, res, next) {
         return res.sendStatus(500);
     }
 }
+
+export function tooltipGenerator(likes, isLiked, userId) {
+    let tooltip = ``;
+
+    if (likes.length === 0) {
+        return tooltip;
+    }
+
+    if (isLiked) {
+        tooltip = `You`;
+    }
+
+    if (likes.length === 1 && isLiked) {
+        return tooltip;
+    }
+
+    if (likes.length === 2 && isLiked && likes[1].userId !== userId) {
+        return (tooltip += ` and ${likes[1].username}`);
+    } 
+    
+    if ( likes.length === 2 && isLiked && likes[1].userId === userId ){
+        return (tooltip += ` and ${likes[0].username}`);
+    }
+
+    if (likes.length === 2 && !isLiked) {
+        return (tooltip += `${likes[0].username} and ${likes[1].username}`);
+    }
+
+    loop: for (let i = 0; i < likes.length; i++) {
+        const analisado = likes[i];
+
+        if (i > 1 && isLiked) {
+            tooltip += ` and ${likes.length - 2} others like`;
+            break;
+        } else if (i >= 2) {
+            tooltip += ` and ${likes.length - 2} others like`;
+            break;
+        } else if (
+            analisado.userId !== userId &&
+            (isLiked || tooltip !== ``) &&
+            i < 2
+        ) {
+            tooltip += `, ${analisado.username}`;
+        } else if (analisado.userId !== userId && i < 2) {
+            tooltip += `${analisado.username}`;
+        }
+    }
+    return tooltip;
+}
