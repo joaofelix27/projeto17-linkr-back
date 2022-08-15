@@ -1,3 +1,4 @@
+import { tooltipGenerator } from "../middlewares/likesValidator.js";
 import {
     postLike,
     removeLike,
@@ -5,16 +6,20 @@ import {
 } from "../repositories/likesRepositories.js/likesRepository.js";
 
 export async function likeGetController(req, res) {
+    const { id: postId } = req.params;
     const { userId } = res.locals.userInfo;
     const { isLiked } = res.locals;
 
     try {
-        const { rows: likes } = await getLikes();
+        const { rows: likes } = await getLikes(postId);
+
+        const tooltip = tooltipGenerator(likes, isLiked, userId)
 
         const resData = {
             likes,
             isLiked,
             userId,
+            tooltip
         };
 
         return res.status(200).send(resData);

@@ -129,7 +129,6 @@ export async function getPostById(req, res) {
 }
 
 export async function putPost(req, res) {
-    console.log(req.body)
     const { id } = req.params;
     const { bodyValue: body, hashtags} = req.body
     const { userInfo } = res.locals;
