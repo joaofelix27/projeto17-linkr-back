@@ -67,6 +67,7 @@ export async function getAllPostsController(req, res) {
                     body,
                     userId,
                     likes,
+                    reposts
                 }) => {
                     const like = parseInt(likes);
                     const metadata = await urlMetadata(link);
@@ -78,6 +79,7 @@ export async function getAllPostsController(req, res) {
                         body,
                         userId,
                         like,
+                        reposts,
                         title: metadata.title,
                         image: metadata.image,
                         description: metadata.description,
@@ -194,5 +196,36 @@ export async function deletePost(req, res) {
         console.log(e);
 
         return res.sendStatus(500);
+    }
+}
+
+export async function repost(req,res){
+    const { userInfo } =  res.locals;
+    const { id } = req.params;
+    const postId = parseInt(id);
+    const { picture,username,userId } = userInfo;
+    
+    try {
+        await postRepository.repost(postId,userId)
+
+        res.status(200).send('OK')
+    } catch (error) {
+        console.log(error)
+        res.sendStatus(500);
+    }
+}
+
+export async function getReposts(req,res){
+    const { userInfo } =  res.locals;
+    const { picture,username,userId } = userInfo;
+    const postId = 50
+
+    try {
+        const { rows:check } = await postRepository.getReposts(postId,userId)
+
+        res.status(200).send(check)
+    } catch (error) {
+        console.log(error)
+        res.sendStatus(500);
     }
 }
