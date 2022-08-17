@@ -1,11 +1,14 @@
 import { Router } from "express";
 import  getUserData  from "../middlewares/getUserData.js";
+
 import {
   createPost,
   deletePost,
   getAllPostsController,
   getPostById,
-  putPost
+  putPost,
+  getReposts,
+  repost
 } from "../controllers/postController.js";
 import { authValidator } from "../middlewares/authMiddlewares/authValidator.js";
 import { postSchema } from "../schemas/postSchema.js";
@@ -18,6 +21,9 @@ postRouter.post(
   getUserData,
   createPost
 );
+
+postRouter.post("/timeline/repost/:id",getUserData,repost)
+
 postRouter.get("/timeline", getUserData, getAllPostsController);
 postRouter.get("/timeline/user/:id", getUserData, getPostById);
 postRouter.delete("/timeline/:id", getUserData, deletePost)
