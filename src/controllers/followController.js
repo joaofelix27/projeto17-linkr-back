@@ -32,9 +32,9 @@ export async function getFollower(req,res) {
     const { rows: ifFollowed } = await getFollowerDB(userId, followedUserId);
     const ifFollowedLength = ifFollowed.length;
     if (ifFollowedLength === 0) {
-      res.status(200).send("Follow");
+      res.status(200).send({message:"Follow",userId:userId});
     } else {
-        res.status(200).send("Unfollow");
+        res.status(200).send({message:"Unfollow",userId:userId});
     }
   } catch {
     res.sendStatus(500);
