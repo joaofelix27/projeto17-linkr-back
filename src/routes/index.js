@@ -1,5 +1,6 @@
 import { Router } from "express";
 import authRouter from "./authRouter.js";
+import commentsRouter from "./commentsRouter.js";
 import hashtagRouter from "./hashtagRouter.js";
 import likesRouter from "./likesRouter.js";
 import postRouter from "./postRouter.js";
@@ -13,5 +14,6 @@ router.use(postRouter);
 router.use(searchRouter);
 router.use(likesRouter);
 router.use(hashtagRouter);
+router.use(commentsRouter);
 
 export default router;
