@@ -26,7 +26,7 @@ async function searchUsers(name,id) {
     
     `);
 }
-//
+///
 async function getUserById(id) {
   return connection.query(
     `
