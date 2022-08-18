@@ -54,9 +54,10 @@ export async function createPost(req, res) {
 }
 
 export async function getAllPostsController(req, res) {
+    const { page } = req.query
     try {
         const { userInfo } = res.locals;
-        const { rows: posts } = await postRepository.getAllPosts();
+        const { rows: posts } = await postRepository.getAllPosts(page);
         const postsMetadata = await Promise.all(
             posts.map(
                 async ({
@@ -99,10 +100,11 @@ export async function getAllPostsController(req, res) {
     }
 }
 export async function getPostById(req, res) {
+    const { page } = req.query
     const { id } = req.params;
     const { userInfo } = res.locals;
     try {
-        const { rows: posts } = await postRepository.getUserPosts(id);
+        const { rows: posts } = await postRepository.getUserPosts(id, page);
 
         const postsMetadata = await Promise.all(
             posts.map(async ({ id, likes, username, picture, link, body, userId,reposts }) => {
