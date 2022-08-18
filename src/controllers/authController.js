@@ -50,7 +50,7 @@ export async function signIn(req, res) {
             return res.status(200).send({
                 token,
                 image: checkUser[0].picture,
-                name: checkUser[0].username,
+                name: checkUser[0].username
             });
         } else {
             return res.sendStatus(401);

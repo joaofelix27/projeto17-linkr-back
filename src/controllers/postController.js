@@ -68,7 +68,8 @@ export async function getAllPostsController(req, res) {
                     body,
                     userId,
                     likes,
-                    reposts
+                    reposts,
+                    createdAt
                 }) => {
                     const like = parseInt(likes);
                     const metadata = await urlMetadata(link);
@@ -81,6 +82,7 @@ export async function getAllPostsController(req, res) {
                         userId,
                         like,
                         reposts,
+                        createdAt,
                         title: metadata.title,
                         image: metadata.image,
                         description: metadata.description,
@@ -227,12 +229,12 @@ export async function getReposts(req,res){
         const { rows:followers } = await followRepository.getFollowers(userId);
         const ids = followers.map( e => e.followedUserId)
         for(let i = 0; i < ids.length;i++){
-            const { rows:repost } = await postRepository.getReposts(ids[i],userId);
+            const { rows:repost } = await postRepository.getReposts(ids[i]);
             reposts = [...reposts,...repost]
         }
 
         const RepostsMetadata = await Promise.all(
-            reposts.map(async ({ id, likes, username, picture, link, body, userId,reposts,reposter,reposterId }) => {
+            reposts.map(async ({ id, likes, username, picture, link, body, userId,reposts,reposter,reposterId,createdAt }) => {
                 const like = parseInt(likes);
                 const metadata = await urlMetadata(link);
                 return {
@@ -246,6 +248,7 @@ export async function getReposts(req,res){
                     reposts,
                     reposter,
                     reposterId,
+                    createdAt,
                     title: metadata.title,
                     image: metadata.image,
                     description: metadata.description,
