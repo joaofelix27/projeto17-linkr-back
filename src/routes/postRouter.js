@@ -22,7 +22,8 @@ postRouter.post(
   createPost
 );
 
-postRouter.post("/timeline/repost/:id",getUserData,repost)
+postRouter.post("/timeline/repost/:id",getUserData,repost);
+postRouter.get("/timeline/reposts",getUserData,getReposts);
 
 postRouter.get("/timeline", getUserData, getAllPostsController);
 postRouter.get("/timeline/user/:id", getUserData, getPostById);

@@ -38,7 +38,7 @@ async function insertPost(userId, link, body) {
 async function getAllPosts() {
     return connection.query(
         `
-        SELECT COUNT(r."postId") as reposts,posts.id, users.username, users.picture, posts.link, posts.body, posts."userId" as "userId", COUNT (likes."postId") as likes
+        SELECT COUNT(DISTINCT r.id) as reposts,posts.id, users.username, users.picture, posts.link, posts.body, posts."userId" as "userId", COUNT (DISTINCT likes.id) as likes
         FROM posts
         JOIN users
         ON posts."userId" = users.id
@@ -56,7 +56,7 @@ async function getAllPosts() {
 async function getUserPosts(id) {
     return connection.query(
         `
-        SELECT COUNT(r."postId") as reposts, COUNT(l."postId") as likes,p.id, u.username, u.picture, p.link, p.body, p."userId" as "userId" 
+        SELECT COUNT(DISTINCT r.id) as reposts, COUNT(DISTINCT l.id) as likes,p.id, u.username, u.picture, p.link, p.body, p."userId" as "userId" 
         FROM posts p
         JOIN users u
         ON p."userId" = u.id
@@ -103,16 +103,16 @@ async function repost(postId,userId){
     values ($1,$2);`,[postId,userId])
 }
 
-async function getReposts(postId,userId){
+async function getReposts(userId,reposterId){
     return connection.query(`
-    SELECT COUNT(r."postId") as reposts,COUNT(l."postId") as likes,u.username,u.picture,p.link,p.body from reposts r
-    LEFT JOIN users u ON u.id = $2
-    LEFT JOIN posts p ON p.id = $1
-    LEFT JOIN likes l ON l."postId" = $1
-    WHERE r."postId" = $1
-    AND r."userId" = $2
-    GROUP BY u.username,u.picture,p.link,p.body
-    `,[postId,userId])
+    SELECT up.id as "reposterId",r."userId" as "userId",up.username as reposter, COUNT(DISTINCT r.id) as reposts,COUNT(DISTINCT l.id) as likes,u.username,u.picture,p.link,p.body from reposts r
+    JOIN users u ON u.id = $1
+    JOIN users up ON up.id = $2
+    JOIN posts p ON p.id = r."postId" 
+    LEFT JOIN likes l ON l."postId" = p.id
+    WHERE r."userId" = $1
+    GROUP BY u.username,u.picture,p.link,p.body,up.username,up.id,r."userId"
+    `,[userId,reposterId])
 }
 
 export const postRepository = {
