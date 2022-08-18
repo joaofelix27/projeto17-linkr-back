@@ -5,6 +5,7 @@ import {
     insertHashtagPosts,
     matchHashtag
 } from "../repositories/hashtagRepositories/hashtagRepository.js";
+import { followRepository } from "../repositories/followRepositories/followRepository.js";
 
 export async function createPost(req, res) {
     const { link, body, hashtags } = req.body;
@@ -67,7 +68,8 @@ export async function getAllPostsController(req, res) {
                     body,
                     userId,
                     likes,
-                    reposts
+                    reposts,
+                    createdAt
                 }) => {
                     const like = parseInt(likes);
                     const metadata = await urlMetadata(link);
@@ -80,6 +82,7 @@ export async function getAllPostsController(req, res) {
                         userId,
                         like,
                         reposts,
+                        createdAt,
                         title: metadata.title,
                         image: metadata.image,
                         description: metadata.description,
@@ -211,6 +214,7 @@ export async function repost(req,res){
 
         res.status(200).send('OK')
     } catch (error) {
+        console.log(1)
         console.log(error)
         res.sendStatus(500);
     }
@@ -218,13 +222,41 @@ export async function repost(req,res){
 
 export async function getReposts(req,res){
     const { userInfo } =  res.locals;
-    const { picture,username,userId } = userInfo;
-    const postId = 50
-
+    const { userId } = userInfo;
+    let reposts = [];
+    
     try {
-        const { rows:check } = await postRepository.getReposts(postId,userId)
+        const { rows:followers } = await followRepository.getFollowers(userId);
+        const ids = followers.map( e => e.followedUserId)
+        for(let i = 0; i < ids.length;i++){
+            const { rows:repost } = await postRepository.getReposts(ids[i]);
+            reposts = [...reposts,...repost]
+        }
 
-        res.status(200).send(check)
+        const RepostsMetadata = await Promise.all(
+            reposts.map(async ({ id, likes, username, picture, link, body, userId,reposts,reposter,reposterId,createdAt }) => {
+                const like = parseInt(likes);
+                const metadata = await urlMetadata(link);
+                return {
+                    id,
+                    username,
+                    picture,
+                    link,
+                    body,
+                    like,
+                    userId,
+                    reposts,
+                    reposter,
+                    reposterId,
+                    createdAt,
+                    title: metadata.title,
+                    image: metadata.image,
+                    description: metadata.description,
+                };
+            })
+        );
+
+        res.status(200).send(RepostsMetadata)
     } catch (error) {
         console.log(error)
         res.sendStatus(500);
