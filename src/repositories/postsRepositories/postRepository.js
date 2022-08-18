@@ -27,9 +27,9 @@ async function insertPost(userId, link, body) {
         `
             INSERT 
             INTO posts
-            ("userId", link, body)
+            ("userId", link, body,"createdAt")
             VALUES
-            ($1, $2, $3) RETURNING id
+            ($1, $2, $3, NOW()) RETURNING id
         `,
         [userId, link, body]
     );
@@ -39,18 +39,26 @@ async function getAllPosts(page) {
     const offset = --page * 10;
     return connection.query(
         `
-        SELECT COUNT(DISTINCT r.id) as reposts,posts.id, users.username, users.picture, posts.link, posts.body, posts."userId" as "userId", COUNT (DISTINCT likes.id) as likes
+        SELECT posts."createdAt",
+		COUNT(DISTINCT r.id) as reposts,
+		posts.id, 
+		users.username, 
+		users.picture, 
+		posts.link, 
+		posts.body, 
+		posts."userId" as "userId", 
+		COUNT (DISTINCT likes.id) as likes
         FROM posts
         JOIN users
         ON posts."userId" = users.id
-        LEFT JOIN reposts r
-        ON r."postId" = posts.id
         LEFT JOIN likes
         ON likes."postId" = posts.id
-        GROUP BY ( posts.id, users.username, users.picture, posts.link, posts.body, posts."userId")
+        LEFT JOIN reposts r
+        ON r."postId" = posts.id
+        GROUP BY ( posts.id, users.username, users.picture, posts.link, posts.body, posts."userId", posts."createdAt")
         ORDER BY id DESC
         LIMIT 10
-        OFFSET $1
+		OFFSET $1
         `,
         [offset]
     );
@@ -60,7 +68,7 @@ async function getUserPosts(id, page) {
     const offset = --page * 10;
     return connection.query(
         `
-        SELECT COUNT(DISTINCT r.id) as reposts, COUNT(DISTINCT l.id) as likes,p.id, u.username, u.picture, p.link, p.body, p."userId" as "userId"
+        SELECT COUNT(DISTINCT r.id) as reposts, COUNT(DISTINCT l.id) as likes,p.id, u.username, u.picture, p.link, p.body, p."userId" as "userId" 
         FROM posts p
         JOIN users u
         ON p."userId" = u.id
@@ -105,25 +113,21 @@ async function repost(postId, userId) {
     return connection.query(
         `
     insert into reposts 
-    ("postId","userId") 
-    values ($1,$2);`,
-        [postId, userId]
-    );
+    ("postId","userId","createdAt") 
+    values ($1,$2,NOW());`,[postId,userId])
 }
 
-async function getReposts(postId, userId) {
-    return connection.query(
-        `
-    SELECT COUNT(r."postId") as reposts,COUNT(l."postId") as likes,u.username,u.picture,p.link,p.body from reposts r
-    LEFT JOIN users u ON u.id = $2
-    LEFT JOIN posts p ON p.id = $1
-    LEFT JOIN likes l ON l."postId" = $1
-    WHERE r."postId" = $1
-    AND r."userId" = $2
-    GROUP BY u.username,u.picture,p.link,p.body
-    `,
-        [postId, userId]
-    );
+async function getReposts(userId){
+    return connection.query(`
+    SELECT p."createdAt",u.id as "userId",r."userId" as "reposterId",userR.username as reposter, COUNT(DISTINCT r.id) as reposts,COUNT(DISTINCT l.id) as likes,u.username,u.picture,p.link,p.body from reposts r
+    JOIN posts p ON p.id = r."postId"
+    JOIN users u ON u.id = p."userId"
+    JOIN users userR ON userR.id = r."userId"
+     
+    LEFT JOIN likes l ON l."postId" = p.id
+    WHERE r."userId" = $1
+    GROUP BY u.username,u.picture,p.link,p.body,r."userId",p."createdAt",userR.username,u.id
+    `,[userId])
 }
 
 export const postRepository = {

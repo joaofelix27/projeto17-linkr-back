@@ -25,8 +25,6 @@ CREATE TABLE public.posts (
   OIDS=FALSE
 );
 
-
-
 CREATE TABLE public.likes (
     "id" serial NOT NULL UNIQUE,
     "postId" int NOT NULL,
@@ -37,7 +35,15 @@ CREATE TABLE public.likes (
   OIDS=FALSE
 );
 
-
+CREATE TABLE public."followedUsers" (
+    "id" serial NOT NULL UNIQUE,
+    "userId" INT NOT NULL REFERENCES users(id),
+	"followedUserId" INT NOT NULL REFERENCES users(id),
+    CONSTRAINT "followingUsers_pk" PRIMARY KEY ("id"),
+    "createdAt" timestamp with time zone NOT NULL DEFAULT 'NOW()'
+) WITH (
+  OIDS=FALSE
+);
 
 CREATE TABLE public."hashtagPost" (
     "id" serial NOT NULL UNIQUE,
@@ -54,7 +60,7 @@ CREATE TABLE public."hashtagPost" (
 CREATE TABLE public.hashtag (
     "id" serial NOT NULL UNIQUE,
     "name" varchar(100) NOT NULL UNIQUE,
-    "usedCount" int NOT NULL DEFAULT 1  
+    "usedCount" int NOT NULL DEFAULT 1  ,
     CONSTRAINT "hashtag_pk" PRIMARY KEY ("id"),
     "createdAt" timestamp with time zone NOT NULL DEFAULT 'NOW()'
 ) WITH (
