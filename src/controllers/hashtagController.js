@@ -15,14 +15,17 @@ export async function getHashtagByName(req, res) {
             const postsMetadata = await Promise.all(
                 findHashtag.map(async (value) => {
                     const like = parseInt(value.likes);
-                    delete value.likes
+                    const comment = parseInt(value.comments);
+                    delete value.likes;
+                    delete value.comments;
                     const metadata = await urlMetadata(value.link);
                     return {
                         ...value,
                         title: metadata.title,
                         image: metadata.image,
                         description: metadata.description,
-                        like
+                        like,
+                        comment
                     };
                 })
             );
@@ -37,7 +40,7 @@ export async function getHashtagByName(req, res) {
             return res.sendStatus(404);
         }
     } catch (e) {
-        res.status(500).send(e.message), "aq";
+        res.status(500).send(e.message);
     }
 }
 export async function getTrending(req, res) {
