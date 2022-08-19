@@ -15,10 +15,17 @@ async function createComment(postId, userId, text) {
 async function getComments(postId) {
     return connection.query(
         `
-            SELECT comments."userId", users.username, users.picture, comments.text
+            SELECT 
+                comments."userId" as "userIdComment", 
+                posts."userId" as "userIdPost", 
+                users.username, 
+                users.picture, 
+                comments.text
             FROM comments
             JOIN users
-            ON "userId" = users.id
+            ON comments."userId" = users.id
+            LEFT JOIN posts
+            ON comments."postId" = posts.id
             WHERE comments."postId" = $1
         `,
         [postId]

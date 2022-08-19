@@ -226,7 +226,6 @@ export async function repost(req,res){
 
         res.status(200).send('OK')
     } catch (error) {
-        console.log(1)
         console.log(error)
         res.sendStatus(500);
     }
