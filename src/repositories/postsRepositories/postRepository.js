@@ -41,7 +41,8 @@ async function getAllPosts(userId) {
         SELECT 
             posts."createdAt",
             COUNT(DISTINCT r.id) as reposts,
-            posts.id, users.username, 
+            posts.id, 
+            users.username, 
             users.picture, 
             posts.link, 
             posts.body, 
