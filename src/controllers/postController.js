@@ -71,7 +71,10 @@ export async function getAllPostsController(req, res) {
                     likes,
                     comments,
                     reposts,
-                    createdAt
+                    createdAt,
+                    isRepost,
+                    reposter,
+                    reposterId
                 }) => {
                     const like = parseInt(likes);
                     const comment = parseInt(comments);
@@ -87,6 +90,9 @@ export async function getAllPostsController(req, res) {
                         like,
                         reposts,
                         createdAt,
+                        isRepost,
+                        reposter,
+                        reposterId,
                         title: metadata.title,
                         image: metadata.image,
                         description: metadata.description,
