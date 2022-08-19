@@ -16,7 +16,20 @@ async function getFollowers(userId){
     SELECT * FROM "followedUsers" f
     WHERE f."userId" = $1`,[userId]);
 }
+async function getFollowersId(userId){
+    return connection.query(
+        `
+            SELECT ARRAY(
+                SELECT "followedUserId"
+                FROM "followedUsers" f
+                WHERE f."userId" = $1
+            )
+        `,
+        [userId]
+    );
+};
 
 export const followRepository = {
-    getFollowers
+    getFollowers,
+    getFollowersId
 }

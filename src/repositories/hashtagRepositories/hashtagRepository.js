@@ -3,18 +3,30 @@ import connection from "../../dbStrategy/postgres.js";
 export function getPostsByHashtag(name, page) {
     const offset = --page * 10;
     return connection.query(
-        `SELECT p.id,u.username,u.picture,p.link,p.body,p."userId" as "userId",COUNT (likes."postId") as likes
-    FROM "hashtagPost" hp 
-    JOIN posts p ON hp."postId"=p.id 
-    JOIN users u ON p."userId"=u.id 
-    LEFT JOIN likes
-    ON likes."postId" = hp."postId"    
-    WHERE hp."hashtagId"=(SELECT id FROM hashtag WHERE name=$1)
-    GROUP BY ( p.id, u.username, u.picture, p.link, p.body)
-    ORDER BY id DESC
-    LIMIT 10
-    OFFSET $2
-;`,
+        `SELECT 
+            p.id,
+            u.username,
+            u.picture,
+            p.link,
+            p.body,
+            p."userId" as "userId",
+            COUNT (likes."postId") as likes,
+            COUNT (DISTINCT comments.id) as comments
+        FROM "hashtagPost" hp 
+        JOIN posts p 
+        ON hp."postId"=p.id 
+        JOIN users u 
+        ON p."userId"=u.id 
+        LEFT JOIN likes
+        ON likes."postId" = hp."postId"
+        LEFT JOIN comments
+        ON comments."postId" = hp."postId"  
+        WHERE hp."hashtagId"=(SELECT id FROM hashtag WHERE name=$1)
+        GROUP BY ( p.id, u.username, u.picture, p.link, p.body)
+        ORDER BY id DESC
+        LIMIT 10
+        OFFSET $2
+        ;`,
         [name, offset]
     );
 }

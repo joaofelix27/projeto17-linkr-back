@@ -58,7 +58,8 @@ export async function getAllPostsController(req, res) {
     const { page } = req.query
     try {
         const { userInfo } = res.locals;
-        const { rows: posts } = await postRepository.getAllPosts(page);
+        const userId = userInfo.userId
+        const { rows: posts } = await postRepository.getAllPosts(userId, page);
         const postsMetadata = await Promise.all(
             posts.map(
                 async ({
@@ -69,16 +70,19 @@ export async function getAllPostsController(req, res) {
                     body,
                     userId,
                     likes,
+                    comments,
                     reposts,
                     createdAt
                 }) => {
                     const like = parseInt(likes);
+                    const comment = parseInt(comments);
                     const metadata = await urlMetadata(link);
                     return {
                         id,
                         username,
                         picture,
                         link,
+                        comment,
                         body,
                         userId,
                         like,
@@ -110,8 +114,9 @@ export async function getPostById(req, res) {
         const { rows: posts } = await postRepository.getUserPosts(id, page);
 
         const postsMetadata = await Promise.all(
-            posts.map(async ({ id, likes, username, picture, link, body, userId,reposts }) => {
+            posts.map(async ({ id, likes, comments, username, picture, link, body, userId,reposts }) => {
                 const like = parseInt(likes);
+                const comment = parseInt(comments);
                 const metadata = await urlMetadata(link);
                 return {
                     id,
@@ -120,6 +125,7 @@ export async function getPostById(req, res) {
                     link,
                     body,
                     like,
+                    comment,
                     userId,
                     reposts,
                     title: metadata.title,
@@ -216,7 +222,6 @@ export async function repost(req,res){
 
         res.status(200).send('OK')
     } catch (error) {
-        console.log(1)
         console.log(error)
         res.sendStatus(500);
     }
@@ -236,8 +241,9 @@ export async function getReposts(req,res){
         }
 
         const RepostsMetadata = await Promise.all(
-            reposts.map(async ({ id, likes, username, picture, link, body, userId,reposts,reposter,reposterId,createdAt }) => {
+            reposts.map(async ({ id, likes, comments, username, picture, link, body, userId,postId,reposts,reposter,reposterId,createdAt }) => {
                 const like = parseInt(likes);
+                const comment = parseInt(comments);
                 const metadata = await urlMetadata(link);
                 return {
                     id,
@@ -246,7 +252,9 @@ export async function getReposts(req,res){
                     link,
                     body,
                     like,
+                    comment,
                     userId,
+                    postId,
                     reposts,
                     reposter,
                     reposterId,

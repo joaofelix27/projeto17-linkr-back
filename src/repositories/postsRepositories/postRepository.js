@@ -35,26 +35,31 @@ async function insertPost(userId, link, body) {
     );
 }
 
-async function getAllPosts(page) {
+async function getAllPosts(userId, page) {
     const offset = --page * 10;
     return connection.query(
         `
-        SELECT posts."createdAt",
-		COUNT(DISTINCT r.id) as reposts,
-		posts.id, 
-		users.username, 
-		users.picture, 
-		posts.link, 
-		posts.body, 
-		posts."userId" as "userId", 
-		COUNT (DISTINCT likes.id) as likes
+        SELECT 
+            posts."createdAt",
+            COUNT(DISTINCT r.id) as reposts,
+            posts.id, 
+            users.username, 
+            users.picture, 
+            posts.link, 
+            posts.body, 
+            posts."userId" as "userId", 
+            COUNT (DISTINCT likes.id) as likes,
+            COUNT (DISTINCT comments.id) as comments
         FROM posts
-        JOIN users
+        JOIN users 
         ON posts."userId" = users.id
+		JOIN "followedUsers" fu ON users.id=fu."followedUserId" AND  fu."userId"=${userId}
         LEFT JOIN likes
         ON likes."postId" = posts.id
         LEFT JOIN reposts r
         ON r."postId" = posts.id
+        LEFT JOIN comments
+        ON comments."postId" = posts.id
         GROUP BY ( posts.id, users.username, users.picture, posts.link, posts.body, posts."userId", posts."createdAt")
         ORDER BY id DESC
         LIMIT 10
@@ -65,10 +70,20 @@ async function getAllPosts(page) {
 }
 
 async function getUserPosts(id, page) {
+    console.log(page)
     const offset = --page * 10;
     return connection.query(
         `
-        SELECT COUNT(DISTINCT r.id) as reposts, COUNT(DISTINCT l.id) as likes,p.id, u.username, u.picture, p.link, p.body, p."userId" as "userId" 
+        SELECT 
+            COUNT(DISTINCT r.id) as reposts, 
+            COUNT(DISTINCT l.id) as likes,
+            COUNT(DISTINCT c.id) as comments,
+            p.id, 
+            u.username, 
+            u.picture, 
+            p.link, 
+            p.body, 
+            p."userId" as "userId" 
         FROM posts p
         JOIN users u
         ON p."userId" = u.id
@@ -76,6 +91,8 @@ async function getUserPosts(id, page) {
         ON l."postId" = p.id
         LEFT JOIN reposts r
         ON r."postId" = p.id
+        LEFT JOIN comments c
+        ON c."postId" = p.id
         WHERE p."userId" = $1
         GROUP BY ( p.id, u.username, u.picture, p.link, p.body, p."userId")
         ORDER BY id DESC
@@ -119,14 +136,32 @@ async function repost(postId, userId) {
 
 async function getReposts(userId){
     return connection.query(`
-    SELECT p."createdAt",u.id as "userId",r."userId" as "reposterId",userR.username as reposter, COUNT(DISTINCT r.id) as reposts,COUNT(DISTINCT l.id) as likes,u.username,u.picture,p.link,p.body from reposts r
-    JOIN posts p ON p.id = r."postId"
-    JOIN users u ON u.id = p."userId"
-    JOIN users userR ON userR.id = r."userId"
-     
-    LEFT JOIN likes l ON l."postId" = p.id
+    SELECT 
+        p."createdAt",
+        u.id as "userId",
+        r."postId",
+        r."userId" as "reposterId",
+        userR.username as reposter, 
+        COUNT(DISTINCT r.id) as reposts,
+        COUNT(DISTINCT l.id) as likes,
+        COUNT(DISTINCT c.id) as comments,
+        u.username,
+        u.picture,
+        p.link,
+        p.body 
+    FROM reposts r
+    JOIN posts p 
+    ON p.id = r."postId"
+    JOIN users u 
+    ON u.id = r."userId"
+    JOIN users userR 
+    ON userR.id = r."userId"
+    LEFT JOIN likes l 
+    ON l."postId" = p.id
+    LEFT JOIN comments c
+    ON c."postId" = p.id
     WHERE r."userId" = $1
-    GROUP BY u.username,u.picture,p.link,p.body,r."userId",p."createdAt",userR.username,u.id
+    GROUP BY u.username,u.picture,p.link,p.body,r."userId",r."postId",p."createdAt",userR.username,u.id
     `,[userId])
 }
 
