@@ -8,9 +8,14 @@ export async function getHashtagByName(req, res) {
     const { page } = req.query;
     const { name } = req.params;
     const { userInfo } = res.locals;
+<<<<<<< HEAD
 
     try {
         const { rows: findHashtag } = await getPostsByHashtag(name, page);
+=======
+    try {
+        const { rows: findHashtag } = await getPostsByHashtag(name);
+>>>>>>> 70c521afdadf928348b79c055dede08bf0fb057a
         const findHashtagLength = findHashtag.length;
            const postsMetadata = await Promise.all(
                 findHashtag.map(async (value) => {
@@ -49,8 +54,17 @@ export async function getHashtagByName(req, res) {
 export async function getTrending(req, res) {
     try {
         const { rows: findHashtags } = await getTrendingHashtags();
+<<<<<<< HEAD
 
         return res.status(200).send(findHashtags);
+=======
+        const findHashtagsLength = findHashtags.length;
+        if (findHashtagsLength > 0) {
+            return res.status(200).send(findHashtags);
+        } else {
+            return res.status(200).send([]);
+        }
+>>>>>>> 70c521afdadf928348b79c055dede08bf0fb057a
     } catch (e) {
         res.status(500).send(e.message);
     }
