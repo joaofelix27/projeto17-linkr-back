@@ -8,7 +8,8 @@ import {
   getPostById,
   putPost,
   getReposts,
-  repost
+  repost,
+  checkNewPosts
 } from "../controllers/postController.js";
 import { authValidator } from "../middlewares/authMiddlewares/authValidator.js";
 import { postSchema } from "../schemas/postSchema.js";
@@ -24,7 +25,7 @@ postRouter.post(
 
 postRouter.post("/timeline/repost/:id",getUserData,repost);
 postRouter.get("/timeline/reposts",getUserData,getReposts);
-
+postRouter.post("/timeline/checkPosts", getUserData, checkNewPosts)
 postRouter.get("/timeline", getUserData, getAllPostsController);
 postRouter.get("/timeline/user/:id", getUserData, getPostById);
 postRouter.delete("/timeline/:id", getUserData, deletePost)

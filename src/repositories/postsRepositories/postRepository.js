@@ -79,7 +79,7 @@ async function getUserPosts(id, page) {
     return connection.query(
         `
         SELECT 
-            COUNT(DISTINCT p."isRepost" = true) as reposts, 
+            COUNT(DISTINCT r.id) as reposts, 
             COUNT(DISTINCT l.id) as likes,
             COUNT(DISTINCT c.id) as comments,
             p.id, 
@@ -93,6 +93,8 @@ async function getUserPosts(id, page) {
         ON p."userId" = u.id
         LEFT JOIN likes l
         ON l."postId" = p.id
+        LEFT JOIN reposts r
+        ON r."postId" = p.id
         LEFT JOIN comments c
         ON c."postId" = p.id
         WHERE p."userId" = $1
@@ -130,10 +132,17 @@ function putPostQuery(body, userId, postId) {
 
 async function repost(postId,userId){
     return connection.query(`
-    INSERT INTO posts ("userId","createdAt","isRepost",body,link,"reposterId",reposter) 
+    INSERT INTO posts ("userId","createdAt","isRepost",body,link,"reposterId",reposter,"originId") 
     VALUES ((SELECT "userId" FROM posts WHERE id = $1),NOW(),true,(SELECT body FROM posts WHERE id = $1),
-    (SELECT link FROM posts WHERE id = $1),$2,(SELECT username FROM users WHERE id = $2));`,
+    (SELECT link FROM posts WHERE id = $1),$2,(SELECT username FROM users WHERE id = $2),$1);`,
     [postId,userId])
+}
+
+async function repostCount(postId,userId){
+    return connection.query(`
+    insert into reposts 
+    ("postId","userId","createdAt") 
+    values ($1,$2,NOW());`,[postId,userId])
 }
 
 async function getReposts(userId){
@@ -167,13 +176,6 @@ async function getReposts(userId){
     `,[userId])
 }
 
-async function repostCount(postId,userId){
-    return connection.query(`
-    insert into reposts 
-    ("postId","userId","createdAt") 
-    values ($1,$2,NOW())`,[postId,userId])
-}
-
 export const postRepository = {
     getSessionByToken,
     getUserById,
@@ -184,4 +186,5 @@ export const postRepository = {
     putPostQuery,
     getReposts,
     repost,
+    repostCount
 };

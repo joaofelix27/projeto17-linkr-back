@@ -11,7 +11,8 @@ export function getPostsByHashtag(name, page) {
             p.body,
             p."userId" as "userId",
             COUNT (likes."postId") as likes,
-            COUNT (DISTINCT comments.id) as comments
+            COUNT (DISTINCT comments.id) as comments,
+            COUNT (DISTINCT reposts.id) as reposts
         FROM "hashtagPost" hp 
         JOIN posts p 
         ON hp."postId"=p.id 
@@ -20,7 +21,9 @@ export function getPostsByHashtag(name, page) {
         LEFT JOIN likes
         ON likes."postId" = hp."postId"
         LEFT JOIN comments
-        ON comments."postId" = hp."postId"  
+        ON comments."postId" = hp."postId" 
+        LEFT JOIN reposts 
+        ON reposts."postId" = hp."postId" 
         WHERE hp."hashtagId"=(SELECT id FROM hashtag WHERE name=$1)
         GROUP BY ( p.id, u.username, u.picture, p.link, p.body)
         ORDER BY id DESC

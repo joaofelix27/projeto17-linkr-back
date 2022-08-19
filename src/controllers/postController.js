@@ -1,4 +1,5 @@
 import urlMetadata from "url-metadata";
+import dayjs from "dayjs"
 import { postRepository } from "../repositories/postsRepositories/postRepository.js";
 import {
     insertHashtag,
@@ -221,7 +222,7 @@ export async function repost(req,res){
     const { userInfo } =  res.locals;
     const { id } = req.params;
     const postId = parseInt(id);
-    const { picture,username,userId } = userInfo;
+    const { userId } = userInfo;
     
     try {
         await postRepository.repost(postId,userId)
@@ -278,4 +279,30 @@ export async function getReposts(req,res){
         console.log(error)
         res.sendStatus(500);
     }
+}
+
+export async function checkNewPosts (req, res) {
+    const {reqTime} = req.body
+    let newPost = 0
+    const { userInfo } = res.locals;
+    const userId = userInfo.userId
+    const reqTimeStr = `${reqTime}`
+    try{
+        const { rows: posts } = await postRepository.getAllPosts(userId, 1);
+        posts.map((post) => {
+
+            const isAfter = dayjs(post.createdAt).isAfter(reqTime)
+            console.log(isAfter)
+            if(isAfter){
+                ++newPost
+            }
+        })
+
+        return res.status(200).send({newPost})
+    } catch (e){
+        console.log(e)
+        return res.sendStatus(500);
+    }
+    
+
 }
