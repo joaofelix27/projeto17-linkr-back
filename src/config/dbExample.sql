@@ -34,6 +34,15 @@ CREATE TABLE public.likes (
 ) WITH (
   OIDS=FALSE
 );
+CREATE TABLE public.reposts (
+    "id" serial NOT NULL UNIQUE,
+    "postId" int NOT NULL,
+    "userId" int NOT NULL,
+    "createdAt" timestamp with time zone NOT NULL DEFAULT 'NOW()',
+    CONSTRAINT "reposts_pk" PRIMARY KEY ("id")
+) WITH (
+  OIDS=FALSE
+);
 
 CREATE TABLE public."followedUsers" (
     "id" serial NOT NULL UNIQUE,
@@ -67,12 +76,23 @@ CREATE TABLE public.hashtag (
   OIDS=FALSE
 );
 
+CREATE TABLE public."comments" (
+    "id" SERIAL PRIMARY KEY,
+    "userId" INTEGER NOT NULL REFERENCES "users"(id),
+    "postId" INTEGER NOT NULL REFERENCES "posts"(id),
+    "text" TEXT NOT NULL,
+    "createdAt" TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW()
+);
+
 
 
 ALTER TABLE "posts" ADD CONSTRAINT "posts_fk0" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE;
 
 ALTER TABLE "likes" ADD CONSTRAINT "likes_fk0" FOREIGN KEY ("postId") REFERENCES "posts"("id") ON DELETE CASCADE;
 ALTER TABLE "likes" ADD CONSTRAINT "likes_fk1" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE;
+
+ALTER TABLE "reposts" ADD CONSTRAINT "reposts_fk0" FOREIGN KEY ("postId") REFERENCES "posts"("id") ON DELETE CASCADE;
+ALTER TABLE "reposts" ADD CONSTRAINT "reposts_fk1" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE;
 
 ALTER TABLE "hashtagPost" ADD CONSTRAINT "hashtagPost_fk0" FOREIGN KEY ("postId") REFERENCES "posts"("id") ON DELETE CASCADE;
 ALTER TABLE "hashtagPost" ADD CONSTRAINT "hashtagPost_fk1" FOREIGN KEY ("hashtagId") REFERENCES "hashtag"("id") ON DELETE CASCADE;

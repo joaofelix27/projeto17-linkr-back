@@ -3,6 +3,7 @@ import {
   postUnfollowUser,
   getFollowerDB,
 } from "../repositories/followRepositories/followRepository.js";
+import { followRepository } from "../repositories/followRepositories/followRepository.js";
 
 export async function followUser(req, res) {
   const { followedUserId } = req.body;
@@ -36,6 +37,17 @@ export async function getFollower(req,res) {
     } else {
         res.status(200).send({message:"Unfollow",userId:userId});
     }
+  } catch {
+    res.sendStatus(500);
+  }
+}
+export async function getFollowed(req,res) {
+  const {
+    userInfo: { userId },
+  } = res.locals;
+  try {
+    const { rows:followers } = await followRepository.getFollowers(userId);
+      res.status(200).send(followers);
   } catch {
     res.sendStatus(500);
   }

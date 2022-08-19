@@ -57,7 +57,8 @@ export async function createPost(req, res) {
 export async function getAllPostsController(req, res) {
     try {
         const { userInfo } = res.locals;
-        const { rows: posts } = await postRepository.getAllPosts();
+        const {userId}= userInfo
+        const { rows: posts } = await postRepository.getAllPosts(userId);
         const postsMetadata = await Promise.all(
             posts.map(
                 async ({
