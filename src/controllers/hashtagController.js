@@ -9,15 +9,16 @@ export async function getHashtagByName(req, res) {
     const { userInfo } = res.locals;
     try {
         const { rows: findHashtag } = await getPostsByHashtag(name);
-
         const findHashtagLength = findHashtag.length;
         if (findHashtagLength > 0) {
             const postsMetadata = await Promise.all(
                 findHashtag.map(async (value) => {
                     const like = parseInt(value.likes);
                     const comment = parseInt(value.comments);
+                    const repost = parseInt(value.reposts);
                     delete value.likes;
                     delete value.comments;
+                    delete value.reposts;
                     const metadata = await urlMetadata(value.link);
                     return {
                         ...value,
@@ -25,7 +26,8 @@ export async function getHashtagByName(req, res) {
                         image: metadata.image,
                         description: metadata.description,
                         like,
-                        comment
+                        comment,
+                        repost
                     };
                 })
             );
