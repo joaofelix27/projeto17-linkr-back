@@ -47,7 +47,10 @@ async function getAllPosts(userId) {
             posts.body, 
             posts."userId" as "userId", 
             COUNT (DISTINCT likes.id) as likes,
-            COUNT (DISTINCT comments.id) as comments
+            COUNT (DISTINCT comments.id) as comments,
+            posts."isRepost",
+            posts."reposter",
+            posts."reposterId"
         FROM posts
         JOIN users 
         ON posts."userId" = users.id
@@ -121,9 +124,10 @@ function putPostQuery(body, userId, postId) {
 
 async function repost(postId,userId){
     return connection.query(`
-    insert into reposts 
-    ("postId","userId","createdAt") 
-    values ($1,$2,NOW());`,[postId,userId])
+    INSERT INTO posts ("userId","createdAt","isRepost",body,link,"reposterId",reposter) 
+    VALUES ((SELECT "userId" FROM posts WHERE id = $1),NOW(),true,(SELECT body FROM posts WHERE id = $1),
+    (SELECT link FROM posts WHERE id = $1),$2,(SELECT username FROM users WHERE id = $2));`,
+    [postId,userId])
 }
 
 async function getReposts(userId){
