@@ -62,3 +62,7 @@ export async function signIn(req, res) {
     }
 }
 
+export async function getUserDataById(req, res){
+    res.status(200).send(res.locals.userInfo);
+}
+
