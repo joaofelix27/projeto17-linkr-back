@@ -40,7 +40,7 @@ async function getAllPosts(userId) {
         `
         SELECT 
             posts."createdAt",
-            COUNT(DISTINCT r.id) as reposts,
+            COUNT(DISTINCT posts."isRepost" = true) as reposts,
             posts.id, 
             users.username, 
             users.picture, 
@@ -56,6 +56,7 @@ async function getAllPosts(userId) {
         JOIN users 
         ON posts."userId" = users.id
 		JOIN "followedUsers" fu ON users.id=fu."followedUserId" AND  fu."userId"=${userId}
+        LEFT JOIN posts post ON post.id = $1
         LEFT JOIN likes
         ON likes."postId" = posts.id
         LEFT JOIN reposts r
@@ -65,7 +66,7 @@ async function getAllPosts(userId) {
         GROUP BY ( posts.id, users.username, users.picture, posts.link, posts.body, posts."userId", posts."createdAt")
         ORDER BY id DESC
         LIMIT 20
-        `
+        `,[userId]
     );
 }
 
@@ -73,7 +74,7 @@ async function getUserPosts(id) {
     return connection.query(
         `
         SELECT 
-            COUNT(DISTINCT r.id) as reposts, 
+            COUNT(DISTINCT p."isRepost" = true) as reposts, 
             COUNT(DISTINCT l.id) as likes,
             COUNT(DISTINCT c.id) as comments,
             p.id, 
@@ -87,8 +88,6 @@ async function getUserPosts(id) {
         ON p."userId" = u.id
         LEFT JOIN likes l
         ON l."postId" = p.id
-        LEFT JOIN reposts r
-        ON r."postId" = p.id
         LEFT JOIN comments c
         ON c."postId" = p.id
         WHERE p."userId" = $1
