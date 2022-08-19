@@ -52,7 +52,7 @@ export async function getTrending(req, res) {
         if (findHashtagsLength > 0) {
             return res.status(200).send(findHashtags);
         } else {
-            return res.sendStatus(404);
+            return res.status(200).send([]);
         }
     } catch (e) {
         res.status(500).send(e.message);
