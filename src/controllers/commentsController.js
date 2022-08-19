@@ -17,8 +17,14 @@ export async function getComments(req, res) {
     const {postId} = req.params;
     try {
         const {rows: comments} = await commentRepository.getComments(postId);
-
-        res.status(200).send(comments);
+        const newComments = await comments.map(({userIdComment, userIdPost, username, picture, text})=>{
+           return {
+            isPostAuthor: userIdPost === userIdComment,
+            username,
+            picture,
+            text
+        }});
+        res.status(200).send(newComments);
     } catch (e) {
         console.log(e);
         res.sendStatus(500);
