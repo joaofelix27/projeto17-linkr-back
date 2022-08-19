@@ -72,7 +72,10 @@ export async function getAllPostsController(req, res) {
                     likes,
                     comments,
                     reposts,
-                    createdAt
+                    createdAt,
+                    isRepost,
+                    reposter,
+                    reposterId
                 }) => {
                     const like = parseInt(likes);
                     const comment = parseInt(comments);
@@ -88,6 +91,9 @@ export async function getAllPostsController(req, res) {
                         like,
                         reposts,
                         createdAt,
+                        isRepost,
+                        reposter,
+                        reposterId,
                         title: metadata.title,
                         image: metadata.image,
                         description: metadata.description,
@@ -219,6 +225,7 @@ export async function repost(req,res){
     
     try {
         await postRepository.repost(postId,userId)
+        await postRepository.repostCount(postId,userId)
 
         res.status(200).send('OK')
     } catch (error) {
