@@ -219,10 +219,11 @@ export async function repost(req,res){
     const { userInfo } =  res.locals;
     const { id } = req.params;
     const postId = parseInt(id);
-    const { picture,username,userId } = userInfo;
+    const { userId } = userInfo;
     
     try {
-        await postRepository.repost(postId,userId)
+        await postRepository.repost(postId,userId);
+        await postRepository.repostCount(postId,userId);
 
         res.status(200).send('OK')
     } catch (error) {
