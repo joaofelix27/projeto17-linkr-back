@@ -1,4 +1,5 @@
 import urlMetadata from "url-metadata";
+import dayjs from "dayjs"
 import { postRepository } from "../repositories/postsRepositories/postRepository.js";
 import {
     insertHashtag,
@@ -55,10 +56,11 @@ export async function createPost(req, res) {
 }
 
 export async function getAllPostsController(req, res) {
+    const { page } = req.query
     try {
         const { userInfo } = res.locals;
-        const {userId}= userInfo
-        const { rows: posts } = await postRepository.getAllPosts(userId);
+        const userId = userInfo.userId
+        const { rows: posts } = await postRepository.getAllPosts(userId, page);
         const postsMetadata = await Promise.all(
             posts.map(
                 async ({
@@ -112,10 +114,11 @@ export async function getAllPostsController(req, res) {
     }
 }
 export async function getPostById(req, res) {
+    const { page } = req.query
     const { id } = req.params;
     const { userInfo } = res.locals;
     try {
-        const { rows: posts } = await postRepository.getUserPosts(id);
+        const { rows: posts } = await postRepository.getUserPosts(id, page);
 
         const postsMetadata = await Promise.all(
             posts.map(async ({ id, likes, comments, username, picture, link, body, userId,reposts }) => {
@@ -222,8 +225,8 @@ export async function repost(req,res){
     const { userId } = userInfo;
     
     try {
-        await postRepository.repost(postId,userId);
-        await postRepository.repostCount(postId,userId);
+        await postRepository.repost(postId,userId)
+        await postRepository.repostCount(postId,userId)
 
         res.status(200).send('OK')
     } catch (error) {
@@ -276,4 +279,30 @@ export async function getReposts(req,res){
         console.log(error)
         res.sendStatus(500);
     }
+}
+
+export async function checkNewPosts (req, res) {
+    const {reqTime} = req.body
+    let newPost = 0
+    const { userInfo } = res.locals;
+    const userId = userInfo.userId
+    const reqTimeStr = `${reqTime}`
+    try{
+        const { rows: posts } = await postRepository.getAllPosts(userId, 1);
+        posts.map((post) => {
+
+            const isAfter = dayjs(post.createdAt).isAfter(reqTime)
+            console.log(isAfter)
+            if(isAfter){
+                ++newPost
+            }
+        })
+
+        return res.status(200).send({newPost})
+    } catch (e){
+        console.log(e)
+        return res.sendStatus(500);
+    }
+    
+
 }

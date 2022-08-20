@@ -1,8 +1,7 @@
 import connection from "../../dbStrategy/postgres.js";
 
-
-export function getPostsByHashtag(name) {
-
+export function getPostsByHashtag(name, page) {
+    const offset = --page * 10;
     return connection.query(
         `SELECT 
             p.id,
@@ -27,10 +26,12 @@ export function getPostsByHashtag(name) {
         ON reposts."postId" = hp."postId" 
         WHERE hp."hashtagId"=(SELECT id FROM hashtag WHERE name=$1)
         GROUP BY ( p.id, u.username, u.picture, p.link, p.body)
+        ORDER BY id DESC
+        LIMIT 10
+        OFFSET $2
         ;`,
-        [name]
+        [name, offset]
     );
-
 }
 export function getTrendingHashtags() {
     return connection.query(
@@ -39,7 +40,7 @@ export function getTrendingHashtags() {
 }
 
 export function matchHashtag(name) {
-    return connection.query(`SELECT * FROM  hashtag WHERE name=$1;`,[name]);
+    return connection.query(`SELECT * FROM  hashtag WHERE name=$1;`, [name]);
 }
 export function insertHashtag(name) {
     return connection.query(

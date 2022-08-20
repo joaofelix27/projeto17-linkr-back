@@ -35,42 +35,47 @@ async function insertPost(userId, link, body) {
     );
 }
 
-async function getAllPosts(userId) {
+async function getAllPosts(userId, page) {
+    const offset = --page * 10;
     return connection.query(
         `
         SELECT 
-            posts."createdAt",
-            COUNT(DISTINCT r.id) as reposts,
-            posts.id, 
-            users.username, 
-            users.picture, 
-            posts.link, 
-            posts.body, 
-            posts."userId" as "userId", 
-            COUNT (DISTINCT likes.id) as likes,
-            COUNT (DISTINCT comments.id) as comments,
-            posts."isRepost",
-            posts."reposter",
-            posts."reposterId"
-        FROM posts
-        JOIN users 
-        ON posts."userId" = users.id
-		JOIN "followedUsers" fu ON users.id=fu."followedUserId" AND  fu."userId"=${userId}
-        LEFT JOIN posts post ON post.id = $1
-        LEFT JOIN likes
-        ON likes."postId" = posts.id OR likes."postId" = posts."originId"
-        LEFT JOIN reposts r
-        ON r."postId" = posts.id OR r."postId" = posts."originId"
-        LEFT JOIN comments
-        ON comments."postId" = posts.id
-        GROUP BY ( posts.id, users.username, users.picture, posts.link, posts.body, posts."userId", posts."createdAt")
-        ORDER BY id DESC
-        LIMIT 20
-        `,[userId]
+        posts."createdAt",
+        COUNT(DISTINCT r.id) as reposts,
+        posts.id, 
+        users.username, 
+        users.picture, 
+        posts.link, 
+        posts.body, 
+        posts."userId" as "userId", 
+        COUNT (DISTINCT likes.id) as likes,
+        COUNT (DISTINCT comments.id) as comments,
+        posts."isRepost",
+        posts."reposter",
+        posts."reposterId"
+    FROM posts
+    JOIN users 
+    ON posts."userId" = users.id
+    JOIN "followedUsers" fu ON users.id=fu."followedUserId" AND  fu."userId"=${userId}
+    LEFT JOIN posts post ON post.id = $1
+    LEFT JOIN likes
+    ON likes."postId" = posts.id
+    LEFT JOIN reposts r
+    ON r."postId" = posts.id
+    LEFT JOIN comments
+    ON comments."postId" = posts.id
+    GROUP BY ( posts.id, users.username, users.picture, posts.link, posts.body, posts."userId", posts."createdAt")
+    ORDER BY id DESC
+    LIMIT 10
+		OFFSET $1
+        `,
+        [offset]
     );
 }
 
-async function getUserPosts(id) {
+async function getUserPosts(id, page) {
+    console.log(page)
+    const offset = --page * 10;
     return connection.query(
         `
         SELECT 
@@ -95,9 +100,10 @@ async function getUserPosts(id) {
         WHERE p."userId" = $1
         GROUP BY ( p.id, u.username, u.picture, p.link, p.body, p."userId")
         ORDER BY id DESC
-        LIMIT 20;
+        LIMIT 10
+        OFFSET $2
         `,
-        [id]
+        [id, offset]
     );
 }
 
